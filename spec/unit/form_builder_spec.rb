@@ -28,8 +28,9 @@ describe ActiveAdmin::FormBuilder do
   end
 
   def build_form(options = {}, &block)
+    model = options.delete(:model) || Post
     options.merge!({:url => posts_path})
-    active_admin_form_for Post.new, options, &block
+    active_admin_form_for model.new, options, &block
   end
 
   context "in general" do
@@ -247,4 +248,21 @@ describe ActiveAdmin::FormBuilder do
     end
   end
 
+  context "with has_many" do
+    let :body do
+      build_form :model => Category do |f|
+        f.instance_eval do
+          @object.posts = [Post.new(:title => 'Oho!')]
+        end
+        
+        f.has_many :posts do |post|
+          post.input :title
+        end
+      end
+    end
+    it "should generate a nested text input once" do
+      body.should == 'blah'
+      body.scan("post_author_attributes_first_name_input").size.should == 1
+    end
+  end
 end
