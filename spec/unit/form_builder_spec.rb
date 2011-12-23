@@ -260,9 +260,19 @@ describe ActiveAdmin::FormBuilder do
         end
       end
     end
+    
     it "should generate a nested text input once" do
-      body.should == 'blah'
-      body.scan("post_author_attributes_first_name_input").size.should == 1
+      # Should match each of these three times, once for each of:
+      # <li class="string input optional stringish" id="category_posts_attributes_0_title_input">
+      #   <label class=" label" for="category_posts_attributes_0_title">Title</label>
+      #   <input id="category_posts_attributes_0_title" maxlength="255" name="category[posts_attributes][0][title]" type="text" value="Oho!" />
+      # </li>
+      
+      # And similarly three times for the generated javascript on the "Add new <object>" link
+      
+      body.scan("category_posts_attributes_0_title").size.should == 3
+      body.scan("category_posts_attributes_NEW_RECORD_title").size.should == 3
+      
     end
   end
 end
